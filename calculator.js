@@ -1,6 +1,8 @@
 let a = 0;
 let b = null;
 let operation = null;
+let result = null;
+let aChanged = false;
 
 const screen = document.getElementById('screen');
 screen.innerText = a;
@@ -30,18 +32,22 @@ function keyboardInput(e) {
 	if (e.key === "/") {
 		operation = e.key;
 		a = screen.innerText;
+    aChanged = true;
 	}
 	if (e.key === "*") {
 		operation = e.key;
 		a = screen.innerText;
+    aChanged = true;
 	}
 	if (e.key === "+") {
 		operation = e.key;
 		a = screen.innerText;
+    aChanged = true;
 	}
 	if (e.key === "-") {
 		operation = e.key;
 		a = screen.innerText;
+    aChanged = true;
 	}
 }
 
@@ -83,11 +89,13 @@ function clear() {
 	b = null;
 	operation = null;
 	screen.innerText = a;
+  aChanged = false;
 }
 
 function operatorEntry() {
 	operation = this.value;
 	a = screen.innerText;
+  aChanged = true;
 }
 
 function decimalEntry() {
@@ -97,18 +105,27 @@ function decimalEntry() {
 }
 
 function evaluate() {
-	b = screen.innerText;
-	if (b==='' || operation==null) {
-		clear();
-		alert("Operands or operator is missing");
-	}
-	else if (b === '0' && operation === '/') {
-		clear();
-		alert("Cannot divide by 0");
-	}
-	else {
-		a = operate(Number(a), Number(b), operation);
-		screen.innerText = a;
+  if (aChanged == false) {
+    result = operate(Number(a), Number(b), operation);
+    screen.innerText = result;
+    a = result;
+  }
+  else {
+  	b = screen.innerText;
+  	if (b==='' || operation==null) {
+  		clear();
+  		alert("Operands or operator is missing");
+  	}
+  	else if (b === '0' && operation === '/') {
+  		clear();
+  		alert("Cannot divide by 0");
+  	}
+  	else {
+  		result = operate(Number(a), Number(b), operation);
+  		screen.innerText = result;
+      a = result;
+      aChanged = false;
+    }
 	}
 }
 
