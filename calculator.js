@@ -104,6 +104,13 @@ function decimalEntry() {
 	}
 }
 
+function deleteEntry() {
+	screen.innerText = screen.innerText.slice(0, -1);
+	if (screen.innerText === '') {
+		screen.innerText = '0';
+	}
+}
+
 function evaluate() {
   if (aChanged == false) {
     result = operate(Number(a), Number(b), operation);
@@ -126,12 +133,5 @@ function evaluate() {
       a = result;
       aChanged = false;
     }
-	}
-}
-
-function deleteEntry() {
-	screen.innerText = screen.innerText.slice(0, -1);
-	if (screen.innerText === '') {
-		screen.innerText = '0';
 	}
 }
