@@ -2,7 +2,9 @@ let a = 0;
 let b = null;
 let operation = null;
 let result = null;
-let aChanged = false;
+
+// unfortunately javascript doesn't have enums, so I'm doing this quick and dirty method for this small project
+State = "A0";
 
 const screen = document.getElementById('screen');
 screen.innerText = a;
@@ -29,25 +31,12 @@ function keyboardInput(e) {
 	if (e.key === "Escape") clear();
 	if (e.key === "Escape") deleteEntry();
 	if (e.key === "Enter" || e.key === '=') evaluate();
-	if (e.key === "/") {
+
+	if (e.key === "/" || e.key === "*" || e.key === "+" || e.key === "-") {
 		operation = e.key;
 		a = screen.innerText;
-    aChanged = true;
-	}
-	if (e.key === "*") {
-		operation = e.key;
-		a = screen.innerText;
-    aChanged = true;
-	}
-	if (e.key === "+") {
-		operation = e.key;
-		a = screen.innerText;
-    aChanged = true;
-	}
-	if (e.key === "-") {
-		operation = e.key;
-		a = screen.innerText;
-    aChanged = true;
+		// first input for b
+		State = "B_First_Input";
 	}
 }
 
@@ -78,9 +67,17 @@ function numberEntry() {
 	if (screen.innerText === '0') {
 		screen.innerText = this.value;
 	}
-	else if (operation != null) {
+
+	else if (State === "A0") {
 		screen.innerText = this.value;
+		State = "AN"
 	}
+
+	else if (State === "B0") {
+		screen.innerText = this.value;
+		State = "BN"
+	}
+
 	else screen.innerText = screen.innerText.concat(this.value);
 }
 
@@ -89,17 +86,29 @@ function clear() {
 	b = null;
 	operation = null;
 	screen.innerText = a;
-  aChanged = false;
+	// a first input and maybe whole entry
+	State = "AN";
 }
 
 function operatorEntry() {
 	operation = this.value;
 	a = screen.innerText;
-  aChanged = true;
+	// b first input
+	State = "B0";
 }
 
 function decimalEntry() {
-	if (screen.innerText.indexOf('.') === -1) {
+	if (State === "A0") {
+		screen.innerText = "0.";
+		State = "AN";
+	}
+
+	else if (State === "B0") {
+		screen.innerText = "0.";
+		State = "BN";
+	}
+
+	else if (screen.innerText.indexOf('.') === -1) {
 		screen.innerText = screen.innerText.concat('.');
 	}
 }
@@ -112,26 +121,31 @@ function deleteEntry() {
 }
 
 function evaluate() {
-  if (aChanged == false) {
-    result = operate(Number(a), Number(b), operation);
-    screen.innerText = result;
-    a = result;
-  }
-  else {
-  	b = screen.innerText;
-  	if (b==='' || operation==null) {
-  		clear();
-  		alert("Operands or operator is missing");
-  	}
-  	else if (b === '0' && operation === '/') {
-  		clear();
-  		alert("Cannot divide by 0");
-  	}
-  	else {
-  		result = operate(Number(a), Number(b), operation);
-  		screen.innerText = result;
-      a = result;
-      aChanged = false;
-    }
+	if (State === "A0") {
+		result = operate(Number(a), Number(b), operation);
+		screen.innerText = result;
+		a = result;
+		State = "A0";
+	}
+
+	else {
+		b = screen.innerText;
+
+		if (b==='' || operation==null) {
+			clear();
+			alert("Operands or operator is missing");
+		}
+
+		else if (b === '0' && operation === '/') {
+			clear();
+			alert("Cannot divide by 0");
+		}
+
+		else {
+			result = operate(Number(a), Number(b), operation);
+			screen.innerText = result;
+			a = result;
+			State = "A0";
+		}
 	}
 }
